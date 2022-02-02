@@ -18,7 +18,12 @@ const userSchema = joi.object({
   name: joi.string().required(),
   email: joi.string().email().required(),
   password: joi.string().required()
-})
+});
+
+const loginSchema = joi.object({
+  email: joi.string().required(),
+  password: joi.string().required()
+});
 
 const app = express();
 app.use(json());
@@ -53,12 +58,6 @@ app.post("/sign-up", async (req, res) => {
 
 app.post("/sign-in", async (req, res) => {
   const login = req.body;
-
-  const loginSchema = joi.object({
-    email: joi.string().required(),
-    password: joi.string().required()
-  });
-
   const validation = loginSchema.validate(login);
 
   if (validation.error){
@@ -79,11 +78,50 @@ app.post("/sign-in", async (req, res) => {
     } 
     
     res.sendStatus(401);
-  } catch (err) {
-    console.log(err); 
+  } catch (error) {
+    console.log(error); 
     res.sendStatus(500);
   }
 })
+
+app.get("/transactions", async (req, res) => {
+  const { authorization } = req.headers;
+  const authorizationSchema = joi.string().pattern(/^Bearer /).required();
+  const validation = authorizationSchema.validate(authorization);
+
+  if (validation.error) {
+    return res.status(422).send("O formato do header é inválido!");
+  }
+
+  const token = authorization?.replace("Bearer ", "");
+
+  if (!token){
+    return res.sendStatus(401);
+  }
+
+  try {
+    const session = await db.collection("sessions").findOne({ token });
+
+    if (!session) {
+      return res.sendStatus(401);
+    }
+
+    const user = await db.collection("users").findOne({ _id: session.userID });
+    const transactions = await db.collection("transactions").find({ userID: session.userID}).toArray();
+
+    const message = {
+      name: user.name,
+      transactions
+    }; 
+    
+    res.send(message);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+  
+})
+
 app.listen(5000, () => {
   console.log("Server is listening on port 5000.")
 });
