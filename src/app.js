@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { MongoClient } from "mongodb"; 
 import joi from "joi";
 import bcrypt from "bcrypt";
+import { v4 as uuid } from "uuid";
 
 dotenv.config();
 
@@ -50,6 +51,39 @@ app.post("/sign-up", async (req, res) => {
   }
 });
 
+app.post("/sign-in", async (req, res) => {
+  const login = req.body;
+
+  const loginSchema = joi.object({
+    email: joi.string().required(),
+    password: joi.string().required()
+  });
+
+  const validation = loginSchema.validate(login);
+
+  if (validation.error){
+    const arrErrors = validation.error.details.map((e) => e.message);
+    const message = arrErrors.join(", ");
+    return res.status(422).send(message);
+  }
+
+  try {
+    const user = await db.collection("users").findOne({ email: login.email });
+
+    if (user && bcrypt.compareSync(login.password, user.password)) {
+      const token = uuid();
+
+      await db.collection("sessions").insertOne({ token, userID: user._id });
+
+      return res.send(token);
+    } 
+    
+    res.sendStatus(401);
+  } catch (err) {
+    console.log(err); 
+    res.sendStatus(500);
+  }
+})
 app.listen(5000, () => {
   console.log("Server is listening on port 5000.")
 });
