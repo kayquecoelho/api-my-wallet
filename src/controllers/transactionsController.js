@@ -21,3 +21,10 @@ export async function getTransactions(req, res) {
     res.sendStatus(500);
   }
 }
+
+export async function registrateTransaction(req,res) {
+  console.log("cheguei aqui")
+  res.send( req.body);
+  
+
+}
