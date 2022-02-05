@@ -24,14 +24,14 @@ export async function getTransactions(req, res) {
 }
 
 export async function registrateTransaction(req,res) {
+  const { value } = req.body;
   const transaction = {
     ...req.body,
     date: dayjs().format("DD/MM/YYYY"),
-    userID: res.locals.session.userID
+    userID: res.locals.session.userID,
   };
-
-  transaction.value.toFixed(2);
-  
+  const fixedNumber = Number(value).toFixed(2);
+  transaction.value = fixedNumber;
   try {
     await db.collection("transactions").insertOne({ ...transaction });
     
