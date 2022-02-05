@@ -1,14 +1,9 @@
 import bcrypt from 'bcrypt';
 import { v4 as uuid } from 'uuid';
-import { stripHtml } from "string-strip-html";
 import db from "../db.js"
 
 export async function registrateUser(req, res) {
   const user = req.body;
-
-  user.name = stripHtml(user.name).result.trim();
-  user.email = stripHtml(user.email).result.trim();
-  user.password = stripHtml(user.password).result.trim();
   
   try {
     const passwordHash = bcrypt.hashSync(user.password, 10);

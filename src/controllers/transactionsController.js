@@ -30,6 +30,7 @@ export async function registrateTransaction(req,res) {
     date: dayjs().format("DD/MM/YYYY"),
     userID: res.locals.session.userID,
   };
+  
   const fixedNumber = Number(value).toFixed(2);
   transaction.value = fixedNumber;
   try {
