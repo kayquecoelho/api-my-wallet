@@ -1,4 +1,5 @@
 import db from "../db.js";
+import dayjs from 'dayjs';
 
 export async function getTransactions(req, res) {
   const { session } = res.locals;
@@ -23,8 +24,20 @@ export async function getTransactions(req, res) {
 }
 
 export async function registrateTransaction(req,res) {
-  console.log("cheguei aqui")
-  res.send( req.body);
-  
+  const transaction = {
+    ...req.body,
+    date: dayjs().format("DD/MM/YYYY"),
+    userID: res.locals.session.userID
+  };
 
+  transaction.value.toFixed(2);
+  
+  try {
+    await db.collection("transactions").insertOne({ ...transaction });
+    
+    res.sendStatus(201);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
 }
