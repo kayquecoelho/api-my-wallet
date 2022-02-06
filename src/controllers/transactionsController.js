@@ -23,7 +23,7 @@ export async function getTransactions(req, res) {
   }
 }
 
-export async function registrateTransaction(req,res) {
+export async function registrateTransaction(req, res) {
   const { value } = req.body;
   const transaction = {
     ...req.body,
@@ -41,4 +41,17 @@ export async function registrateTransaction(req,res) {
     console.log(error);
     res.sendStatus(500);
   }
+}
+
+export async function deleteTransaction(req, res){
+  const { transaction } = res.locals;
+
+ try {
+    await db.collection("transactions").deleteOne(transaction);
+
+    res.sendStatus(200);
+ } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+ }
 }
