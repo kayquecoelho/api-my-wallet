@@ -1,4 +1,4 @@
-import db from "../db.js";
+import db from '../db.js';
 import dayjs from 'dayjs';
 
 export async function getTransactions(req, res) {
@@ -27,15 +27,15 @@ export async function registrateTransaction(req, res) {
   const { value } = req.body;
   const transaction = {
     ...req.body,
-    date: dayjs().format("DD/MM/YYYY"),
+    date: dayjs().format('DD/MM/YYYY'),
     userID: res.locals.session.userID,
   };
-  
+
   const fixedNumber = Number(value).toFixed(2);
   transaction.value = fixedNumber;
   try {
-    await db.collection("transactions").insertOne({ ...transaction });
-    
+    await db.collection('transactions').insertOne({ ...transaction });
+
     res.sendStatus(201);
   } catch (error) {
     console.log(error);
@@ -43,35 +43,35 @@ export async function registrateTransaction(req, res) {
   }
 }
 
-export async function deleteTransaction(req, res){
+export async function deleteTransaction(req, res) {
   const { transaction } = res.locals;
 
- try {
-    await db.collection("transactions").deleteOne(transaction);
+  try {
+    await db.collection('transactions').deleteOne(transaction);
 
     res.sendStatus(200);
- } catch (error) {
+  } catch (error) {
     console.log(error);
     res.sendStatus(500);
- }
+  }
 }
 
-export async function updateTransaction(req, res){
+export async function updateTransaction(req, res) {
   const { transaction } = res.locals;
   const updatedTransaction = req.body;
   const fixedNumber = Number(updatedTransaction.value).toFixed(2);
   updatedTransaction.value = fixedNumber;
-  
- try {
-    await db.collection("transactions").updateOne(transaction, {
+
+  try {
+    await db.collection('transactions').updateOne(transaction, {
       $set: {
-        ...updatedTransaction
-      }
+        ...updatedTransaction,
+      },
     });
 
     res.sendStatus(200);
- } catch (error) {
+  } catch (error) {
     console.log(error);
     res.sendStatus(500);
- }
+  }
 }

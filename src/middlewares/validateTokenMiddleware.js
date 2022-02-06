@@ -1,16 +1,16 @@
-import db from "../db.js";
-import authSchema from "../schemas/authSchema.js";
+import db from '../db.js';
+import authSchema from '../schemas/authSchema.js';
 
 export async function validateTokenMiddleware(req, res, next) {
   const { authorization } = req.headers;
   const validation = authSchema.validate(authorization);
-  
+
   if (validation.error) {
     return res.status(422).send('O formato do header é inválido!');
   }
-  
+
   const token = authorization?.replace('Bearer ', '');
-  
+
   if (!token) {
     return res.sendStatus(401);
   }

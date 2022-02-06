@@ -1,10 +1,10 @@
 import bcrypt from 'bcrypt';
 import { v4 as uuid } from 'uuid';
-import db from "../db.js"
+import db from '../db.js';
 
 export async function registrateUser(req, res) {
   const user = req.body;
-  
+
   try {
     const passwordHash = bcrypt.hashSync(user.password, 10);
     await db.collection('users').insertOne({ ...user, password: passwordHash });
@@ -15,7 +15,7 @@ export async function registrateUser(req, res) {
   }
 }
 
-export async function login (req, res) {
+export async function login(req, res) {
   const login = req.body;
 
   try {
