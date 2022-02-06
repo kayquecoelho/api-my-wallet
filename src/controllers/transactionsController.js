@@ -13,7 +13,7 @@ export async function getTransactions(req, res) {
 
     const message = {
       name: user.name,
-      transactions,
+      transactions: [...transactions].reverse(),
     };
 
     res.send(message);
