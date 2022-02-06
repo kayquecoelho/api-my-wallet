@@ -55,3 +55,23 @@ export async function deleteTransaction(req, res){
     res.sendStatus(500);
  }
 }
+
+export async function updateTransaction(req, res){
+  const { transaction } = res.locals;
+  const updatedTransaction = req.body;
+  const fixedNumber = Number(updatedTransaction.value).toFixed(2);
+  updatedTransaction.value = fixedNumber;
+  
+ try {
+    await db.collection("transactions").updateOne(transaction, {
+      $set: {
+        ...updatedTransaction
+      }
+    });
+
+    res.sendStatus(200);
+ } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+ }
+}

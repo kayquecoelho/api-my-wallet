@@ -4,6 +4,7 @@ import idSchema from "../schemas/idSchema.js";
 
 export async function validateIDMiddleware(req, res, next){
   const { id } = req.params;
+  const { session } = res.locals;
   
   if (!id) {
     return res.sendStatus(422);
@@ -21,9 +22,17 @@ export async function validateIDMiddleware(req, res, next){
       if (!transaction) {
         return res.sendStatus(404);
       }
+    
+      const isAuth = await db.collection("transactions").findOne({ 
+        _id: new ObjectId(id), 
+        userID: new ObjectId(session.userID) 
+      })
       
+      if (!isAuth){
+        return res.status(401).send("Você não tem autorização!")
+      }
+
       res.locals.transaction = transaction;
-      console.log(transaction)
   } catch (error) {
       console.log(error);
       res.sendStatus(500);
